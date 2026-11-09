@@ -1,0 +1,51 @@
+{
+  "scenario": "Synthetic support-ticket pipeline; policy changes from 25 to 45 minutes",
+  "rows": 12,
+  "steps": [
+    {
+      "label": "first run",
+      "tasks": [
+        {
+          "name": "normalize",
+          "status": "executed",
+          "artifact_sha256": "11fdad7b845bde7a38faea55ff0de4bbdaca234452feb5167569300768c897d7"
+        },
+        {
+          "name": "summarize",
+          "status": "executed",
+          "artifact_sha256": "c71eb3a2e002c95fc33075b5cd88e7dd5c7001ac5113b20d02c72a075fbb067e"
+        }
+      ]
+    },
+    {
+      "label": "identical rerun",
+      "tasks": [
+        {
+          "name": "normalize",
+          "status": "cached",
+          "artifact_sha256": "11fdad7b845bde7a38faea55ff0de4bbdaca234452feb5167569300768c897d7"
+        },
+        {
+          "name": "summarize",
+          "status": "cached",
+          "artifact_sha256": "c71eb3a2e002c95fc33075b5cd88e7dd5c7001ac5113b20d02c72a075fbb067e"
+        }
+      ]
+    },
+    {
+      "label": "policy-only change",
+      "tasks": [
+        {
+          "name": "normalize",
+          "status": "cached",
+          "artifact_sha256": "11fdad7b845bde7a38faea55ff0de4bbdaca234452feb5167569300768c897d7"
+        },
+        {
+          "name": "summarize",
+          "status": "executed",
+          "artifact_sha256": "3a8ec4dbca03fbd4b19007e898612fc0709f7dcbab13cdc8104eda5ae0252938"
+        }
+      ]
+    }
+  ]
+}

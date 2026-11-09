@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101525">
+  <meta name="description" content="RunWeave shows why each local pipeline task ran or came from a verified content-addressed cache.">
+  <title>RunWeave · Explain every pipeline run</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #101525; color: #f3f5ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: radial-gradient(circle at 82% 5%, #243b50 0, #101525 36%), #101525; }
+    a { color: inherit; }
+    a:focus-visible { outline: 3px solid #a9edc5; outline-offset: 4px; border-radius: 4px; }
+    .wrap { max-width: 1120px; margin: auto; padding: 0 28px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 26px 0; border-bottom: 1px solid #ffffff22; }
+    .brand { font-weight: 800; letter-spacing: -.04em; font-size: 23px; text-decoration: none; }
+    .brand span { color: #a9edc5; }
+    .nav { display: flex; gap: 22px; align-items: center; font-size: 14px; color: #c6cbdd; }
+    .nav a:hover, .link:hover { color: #a9edc5; }
+    main { padding-bottom: 80px; }
+    .hero { padding: 78px 0 55px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 54px; align-items: center; }
+    .eyebrow { display: inline-flex; gap: 9px; align-items: center; text-transform: uppercase; letter-spacing: .14em; color: #a9edc5; font-size: 12px; font-weight: 800; }
+    .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #a9edc5; box-shadow: 0 0 20px #a9edc5; }
+    h1 { font-size: clamp(42px, 6vw, 72px); letter-spacing: -.065em; line-height: 1.02; margin: 22px 0; max-width: 740px; }
+    h1 em { color: #a9edc5; font-style: normal; }
+    .lede { color: #c4cadb; font-size: 18px; line-height: 1.6; max-width: 600px; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 12px 18px; border-radius: 10px; background: #a9edc5; color: #10251b; font-weight: 800; font-size: 14px; text-decoration: none; }
+    .button.secondary { border: 1px solid #ffffff44; color: #e6eaf5; background: #ffffff0d; }
+    .button:hover { filter: brightness(1.08); }
+    .machine { position: relative; border: 1px solid #5f738566; background: linear-gradient(145deg, #1f2c3d, #151c2b); border-radius: 20px; padding: 24px; box-shadow: 0 32px 100px #0006, inset 0 1px #ffffff15; }
+    .machine:before { content: ""; position: absolute; inset: -12px; border: 1px solid #5a8d7a33; border-radius: 29px; z-index: -1; }
+    .window-top { display: flex; justify-content: space-between; gap: 12px; color: #b4bed1; text-transform: uppercase; letter-spacing: .12em; font-size: 11px; font-weight: 800; padding-bottom: 18px; border-bottom: 1px solid #ffffff1a; }
+    .dots { display: flex; gap: 5px; }
+    .dots i { width: 7px; height: 7px; border-radius: 50%; background: #708090; }
+    .rail { display: flex; align-items: stretch; gap: 12px; margin-top: 18px; }
+    .step { flex: 1; border: 1px solid #ffffff22; background: #0d1521; padding: 16px; border-radius: 12px; min-width: 0; }
+    .step small { display: block; color: #91a1b8; font-size: 10px; letter-spacing: .12em; font-weight: 800; text-transform: uppercase; }
+    .step strong { display: block; margin: 7px 0 13px; font-size: 17px; }
+    .hash { color: #89dab0; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    .arrow { display: grid; align-items: center; font-size: 20px; color: #a9edc5; }
+    .terminal { background: #090f18; color: #c2d7ca; border-radius: 10px; margin-top: 18px; padding: 16px; font: 12px/1.8 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-x: auto; }
+    .terminal b { color: #a9edc5; font-weight: 600; }
+    .terminal .muted { color: #718196; }
+    .section-head { padding-top: 30px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: end; gap: 20px; }
+    .section-head h2 { font-size: clamp(28px, 3vw, 40px); margin: 5px 0 0; letter-spacing: -.045em; }
+    .section-head p { color: #aab6c9; margin: 0; max-width: 390px; line-height: 1.5; font-size: 14px; }
+    .runs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .run { border: 1px solid #ffffff26; border-radius: 16px; background: #172234; padding: 22px; }
+    .run .number { color: #9ccab2; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .run h3 { margin: 10px 0 8px; font-size: 20px; letter-spacing: -.025em; }
+    .run p { min-height: 44px; color: #b8c3d3; font-size: 14px; line-height: 1.5; margin: 0 0 19px; }
+    .task { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #ffffff1a; padding: 12px 0; font-size: 14px; gap: 12px; }
+    .badge { border-radius: 999px; padding: 5px 9px; text-transform: uppercase; font-size: 10px; font-weight: 800; letter-spacing: .07em; }
+    .executed { color: #fbd4a0; background: #8a502a44; }
+    .cached { color: #a9edc5; background: #39745155; }
+    .evidence { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; margin-top: 18px; }
+    .panel { border: 1px solid #ffffff24; border-radius: 16px; padding: 24px; background: #ffffff0b; }
+    .panel h3 { margin: 0 0 10px; font-size: 19px; }
+    .panel p, .panel li { color: #b8c3d3; font-size: 14px; line-height: 1.65; }
+    .panel p { margin: 0 0 12px; }
+    .panel ul { padding-left: 19px; margin: 8px 0 0; }
+    .link { color: #a9edc5; font-weight: 750; text-underline-offset: 3px; }
+    footer { border-top: 1px solid #ffffff22; color: #90a0b7; font-size: 13px; padding: 26px 0 40px; line-height: 1.5; }
+    @media (max-width: 800px) { .hero, .evidence { grid-template-columns: 1fr; } .hero { padding-top: 55px; gap: 32px; } .runs { grid-template-columns: 1fr; } .run p { min-height: 0; } .section-head { display: block; } .section-head p { margin-top: 12px; } }
+    @media (max-width: 430px) { .wrap { padding: 0 18px; } header { padding: 20px 0; } .nav { gap: 12px; font-size: 12px; } .hero { padding-top: 45px; } .machine { padding: 16px; } .rail { gap: 7px; } .step { padding: 12px; } .step strong { font-size: 14px; } .step small { font-size: 9px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="./" aria-label="RunWeave home">run<span>weave</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#experiment">Experiment</a>
+        <a href="https://github.com/brohum10/runweave">Source ↗</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="title">
+        <div>
+          <span class="eyebrow">A local pipeline you can explain</span>
+          <h1 id="title">Every result has <em>a reason.</em></h1>
+          <p class="lede">RunWeave records the inputs behind each pipeline step, checks stored outputs by content hash, and shows exactly which step had to run again after a change.</p>
+          <div class="actions">
+            <a class="button" href="#experiment">See the three-run experiment ↓</a>
+            <a class="button secondary" href="https://github.com/brohum10/runweave#run-your-own-pipeline">Run it locally ↗</a>
+          </div>
+        </div>
+        <div class="machine" aria-label="Diagram showing a normalized ticket file feeding a regional summary">
+          <div class="window-top"><span>Pipeline / support tickets</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="rail">
+            <div class="step"><small>Task 01</small><strong>Normalize</strong><span class="hash">input + code → hash</span></div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="step"><small>Task 02</small><strong>Summarize</strong><span class="hash">artifact + policy → hash</span></div>
+          </div>
+          <div class="terminal" aria-hidden="true"><span class="muted">$ python demo.py</span><br>first run: <b>execute</b> → <b>execute</b><br>same inputs: <b>cache</b> → <b>cache</b><br>policy changed: <b>cache</b> → <b>execute</b></div>
+        </div>
+      </section>
+      <section id="experiment" aria-labelledby="experiment-title">
+        <div class="section-head">
+          <div><span class="eyebrow">Reproducible example</span><h2 id="experiment-title">Change one thing. See what moves.</h2></div>
+          <p>A synthetic 12-ticket dataset feeds two tasks. Only the policy file changes before the third run.</p>
+        </div>
+        <div class="runs">
+          <article class="run"><span class="number">RUN 01 / COLD</span><h3>Build the baseline</h3><p>With no cache yet, both tasks create new outputs.</p><div class="task"><span>Normalize tickets</span><span class="badge executed">Executed</span></div><div class="task"><span>Regional summary</span><span class="badge executed">Executed</span></div></article>
+          <article class="run"><span class="number">RUN 02 / WARM</span><h3>Nothing changed</h3><p>The cache keys match, and both stored output hashes still verify.</p><div class="task"><span>Normalize tickets</span><span class="badge cached">Cached</span></div><div class="task"><span>Regional summary</span><span class="badge cached">Cached</span></div></article>
+          <article class="run"><span class="number">RUN 03 / POLICY EDIT</span><h3>One input changed</h3><p>The policy limit moves from 25 to 45 minutes. Normalized data is still valid; only its summary is rebuilt.</p><div class="task"><span>Normalize tickets</span><span class="badge cached">Cached</span></div><div class="task"><span>Regional summary</span><span class="badge executed">Executed</span></div></article>
+        </div>
+        <div class="evidence">
+          <div class="panel"><h3>Evidence, not a black box</h3><p>The <a class="link" href="evidence.json">machine-readable result</a> includes each task's status and complete SHA-256 output hash. Run the included script to reproduce it in a temporary workspace. The repository also includes 18 tests for cache invalidation, damaged artifacts, failed tasks, cycles, and unsafe paths.</p><a class="link" href="https://github.com/brohum10/runweave">Read the code and tests ↗</a></div>
+          <div class="panel"><h3>What this does not prove</h3><p>This is a local synthetic example, not a performance or production reliability benchmark.</p><ul><li>Scripts must be trusted and deterministic.</li><li>All output-affecting inputs must be declared.</li><li>A hash checks bytes; it does not prove correctness.</li></ul></div>
+        </div>
+      </section>
+    </main>
+    <footer>RunWeave · Standard-library Python · Synthetic data only · <a href="https://github.com/brohum10/runweave#honest-boundaries">Full limitations</a></footer>
+  </div>
+</body>
+</html>
