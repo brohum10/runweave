@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "name": "normalize",
+      "script": "examples/scripts/normalize.py",
+      "inputs": ["examples/tickets.csv"],
+      "needs": [],
+      "args": ["{input:examples/tickets.csv}", "{output}"],
+      "timeout_seconds": 10
+    },
+    {
+      "name": "summarize",
+      "script": "examples/scripts/summarize.py",
+      "inputs": ["examples/policy.json"],
+      "needs": ["normalize"],
+      "args": ["{dep:normalize}", "{input:examples/policy.json}", "{output}"],
+      "timeout_seconds": 10
+    }
+  ]
+}

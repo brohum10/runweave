@@ -1,0 +1,13 @@
+ticket_id,region,channel,queue_minutes
+T001,EU,email,23
+T002,US,chat,8
+T003,EU,web,31
+T004,US,email,12
+T005,EU,chat,18
+T006,US,web,6
+T007,EU,email,42
+T008,US,chat,14
+T009,EU,web,27
+T010,US,email,9
+T011,EU,chat,16
+T012,US,web,11
