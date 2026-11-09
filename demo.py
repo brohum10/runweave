@@ -34,14 +34,25 @@ def main() -> None:
         observed = [[step["status"] for step in record["tasks"]] for record in records]
         if observed != expected:
             raise RuntimeError(f"Unexpected cache behavior: {observed}")
+        summaries = []
+        for record in records:
+            digest = record["tasks"][1]["artifact_sha256"]
+            summaries.append(json.loads((state / "objects" / digest[:2] / digest).read_text()))
+        eu = [next(item for item in summary["regions"] if item["region"] == "EU") for summary in summaries]
+        if [item["over_policy"] for item in eu] != [True, True, False]:
+            raise RuntimeError("The example policy decision did not change as expected")
         evidence = {
             "scenario": "Synthetic support-ticket pipeline; policy changes from 25 to 45 minutes",
             "rows": 12,
             "steps": [
                 {"label": label,
+                 "policy_limit_minutes": summary["policy_max_p90_queue_minutes"],
+                 "eu_p90_minutes": item["p90_queue_minutes"],
+                 "eu_over_policy": item["over_policy"],
                  "tasks": [{"name": step["name"], "status": step["status"],
                             "artifact_sha256": step["artifact_sha256"]} for step in record["tasks"]]}
-                for label, record in zip(("first run", "identical rerun", "policy-only change"), records)
+                for label, record, summary, item in zip(("first run", "identical rerun", "policy-only change"),
+                                                         records, summaries, eu)
             ],
         }
         print(json.dumps(evidence, indent=2))

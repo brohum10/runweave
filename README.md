@@ -25,7 +25,7 @@ The demo copies a **synthetic 12-ticket support dataset** to a temporary workspa
 | Identical rerun | Cached | Cached | Same declared inputs and verified artifacts |
 | Policy-only change | Cached | Executed | Only the summary's policy input changed |
 
-[The checked-in evidence](docs/evidence.json) contains the task statuses and full SHA-256 artifact hashes. Regenerate it with `python demo.py --save docs/evidence.json`; the run timestamps are deliberately omitted from that compact file. This demonstrates cache invalidation on a small constructed fixture, **not** a production speedup or reliability claim.
+The EU sample has a 42-minute p90 queue. It is over the original 25-minute policy and within the revised 45-minute policy; the raw and normalized tickets are identical across all three runs. [The checked-in evidence](docs/evidence.json) contains that decision, task statuses, and full SHA-256 artifact hashes. Regenerate it with `python demo.py --save docs/evidence.json`; run timestamps are deliberately omitted from the compact file. This demonstrates cache invalidation on a small constructed fixture, **not** a production speedup or reliability claim.
 
 ## Run your own pipeline
 

@@ -4,6 +4,9 @@
   "steps": [
     {
       "label": "first run",
+      "policy_limit_minutes": 25,
+      "eu_p90_minutes": 42.0,
+      "eu_over_policy": true,
       "tasks": [
         {
           "name": "normalize",
@@ -19,6 +22,9 @@
     },
     {
       "label": "identical rerun",
+      "policy_limit_minutes": 25,
+      "eu_p90_minutes": 42.0,
+      "eu_over_policy": true,
       "tasks": [
         {
           "name": "normalize",
@@ -34,6 +40,9 @@
     },
     {
       "label": "policy-only change",
+      "policy_limit_minutes": 45,
+      "eu_p90_minutes": 42.0,
+      "eu_over_policy": false,
       "tasks": [
         {
           "name": "normalize",
